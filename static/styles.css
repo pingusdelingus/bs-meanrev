@@ -1,0 +1,89 @@
+:root {
+    --bg: #1e1e2e;
+    --surface: #313244;
+    --text: #cdd6f4;
+    --primary: #89b4fa;
+    --secondary: #a6e3a1;
+    --accent: #f5c2e7;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 20px;
+}
+
+.calculator-container, .result-container {
+    background-color: var(--surface);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    margin-bottom: 20px;
+    border: 1px solid var(--primary);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.form-control {
+    background-color: var(--bg);
+    border: 1px solid var(--primary);
+    color: var(--text);
+}
+
+.form-control:focus {
+    background-color: var(--bg);
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 0 0.25rem rgba(245, 194, 231, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.alert-info {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    color: var(--text);
+}
+
+#plot {
+    width: 100%;
+    height: 400px;
+    margin-top: 20px;
+}
+
+.spx-info {
+    background-color: var(--surface);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--secondary);
+}
+
+.spx-info h4 {
+    color: var(--secondary);
+    margin-bottom: 10px;
+}
+
+.spx-info p {
+    margin: 5px 0;
+}
+
+.text-danger {
+    color: #f38ba8 !important;
+    font-size: 0.9em;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: rgba(243, 139, 168, 0.1);
+} 

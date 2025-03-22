@@ -2,9 +2,80 @@ from flask import Flask, render_template, request, jsonify
 import numpy as np
 from scipy.stats import norm
 import plotly.graph_objects as go
+import plotly.utils
 import json
+import yfinance as yf
+from datetime import datetime, timedelta
+import pytz
+import time
+from functools import lru_cache
 
 app = Flask(__name__)
+
+@lru_cache(maxsize=1)
+def get_spx_options():
+    """
+    Get current SPX price and 1-month ATM options with caching
+    """
+    try:
+        # Add delay to respect rate limits
+        time.sleep(1)
+        
+        spx = yf.Ticker("^GSPC")
+        current_price = spx.info.get('regularMarketPrice', 0)
+        
+        if current_price == 0:
+            return {
+                'current_price': 'N/A',
+                'atm_call': 'N/A',
+                'atm_put': 'N/A',
+                'error': 'Unable to fetch current price'
+            }
+        
+        # Get options chain with error handling
+        try:
+            options = spx.option_chain()
+            calls = options.calls
+            puts = options.puts
+        except Exception as e:
+            print(f"Error fetching options chain: {e}")
+            return {
+                'current_price': round(current_price, 2),
+                'atm_call': 'N/A',
+                'atm_put': 'N/A',
+                'error': 'Unable to fetch options data'
+            }
+        
+        # Find ATM options (closest to current price)
+        calls['strike_diff'] = abs(calls['strike'] - current_price)
+        puts['strike_diff'] = abs(puts['strike'] - current_price)
+        
+        try:
+            atm_call = calls.loc[calls['strike_diff'].idxmin(), 'lastPrice']
+            atm_put = puts.loc[puts['strike_diff'].idxmin(), 'lastPrice']
+        except Exception as e:
+            print(f"Error finding ATM options: {e}")
+            return {
+                'current_price': round(current_price, 2),
+                'atm_call': 'N/A',
+                'atm_put': 'N/A',
+                'error': 'Unable to find ATM options'
+            }
+        
+        return {
+            'current_price': round(current_price, 2),
+            'atm_call': round(atm_call, 2),
+            'atm_put': round(atm_put, 2),
+            'error': None
+        }
+    except Exception as e:
+        print(f"Error fetching SPX data: {e}")
+        return {
+            'current_price': 'N/A',
+            'atm_call': 'N/A',
+            'atm_put': 'N/A',
+            'error': str(e)
+        }
 
 def black_scholes(S, K, T, r, sigma, option_type='call'):
     """
@@ -46,6 +117,10 @@ def simulate_gbm(S, T, r, sigma, num_steps=1000):
 def index():
     return render_template('index.html')
 
+@app.route('/spx_info')
+def spx_info():
+    return jsonify(get_spx_options())
+
 @app.route('/calculate', methods=['POST'])
 def calculate():
     data = request.get_json()
@@ -63,27 +138,38 @@ def calculate():
     # Simulate stock price path
     t, S_t = simulate_gbm(S, T, r, sigma)
     
-    # Create stock price plot
+    # Create stock price plot with dark theme
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=t,
         y=S_t,
         mode='lines',
         name='Stock Price',
-        line=dict(color='blue')
+        line=dict(color='#89b4fa')
     ))
     fig.add_trace(go.Scatter(
         x=[0, T],
         y=[K, K],
         mode='lines',
         name='Strike Price',
-        line=dict(color='red', dash='dash')
+        line=dict(color='#f5c2e7', dash='dash')
     ))
     fig.update_layout(
         title='Stock Price Simulation (Geometric Brownian Motion)',
         xaxis_title='Time (years)',
         yaxis_title='Stock Price',
-        showlegend=True
+        showlegend=True,
+        paper_bgcolor='#313244',
+        plot_bgcolor='#1e1e2e',
+        font=dict(color='#cdd6f4'),
+        xaxis=dict(
+            gridcolor='#89b4fa',
+            color='#cdd6f4'
+        ),
+        yaxis=dict(
+            gridcolor='#89b4fa',
+            color='#cdd6f4'
+        )
     )
     
     plot_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)

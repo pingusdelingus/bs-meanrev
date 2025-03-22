@@ -7,33 +7,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .calculator-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .result-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .form-label {
-            font-weight: 500;
-        }
-        #plot {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
@@ -67,6 +41,14 @@
                         <button type="submit" class="btn btn-primary">Calculate</button>
                     </form>
                 </div>
+
+                <div class="spx-info">
+                    <h4>SPX Options Information</h4>
+                    <p>Current SPX Price: <span id="spx_price">Loading...</span></p>
+                    <p>1 Month ATM Call: <span id="spx_call">Loading...</span></p>
+                    <p>1 Month ATM Put: <span id="spx_put">Loading...</span></p>
+                    <p id="spx_error" class="text-danger"></p>
+                </div>
             </div>
             
             <div class="col-md-6">
@@ -83,6 +65,33 @@
 
     <script>
         $(document).ready(function() {
+            // Function to update SPX information
+            function updateSPXInfo() {
+                $.ajax({
+                    url: '/spx_info',
+                    method: 'GET',
+                    success: function(response) {
+                        $('#spx_price').text(response.current_price);
+                        $('#spx_call').text(response.atm_call);
+                        $('#spx_put').text(response.atm_put);
+                        
+                        if (response.error) {
+                            $('#spx_error').text(response.error).show();
+                        } else {
+                            $('#spx_error').hide();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching SPX info:', error);
+                        $('#spx_error').text('Error fetching SPX data. Please try again later.').show();
+                    }
+                });
+            }
+
+            // Update SPX info every 5 minutes
+            updateSPXInfo();
+            setInterval(updateSPXInfo, 300000);
+
             $('#optionForm').on('submit', function(e) {
                 e.preventDefault();
                 
@@ -101,7 +110,46 @@
                     data: JSON.stringify(data),
                     success: function(response) {
                         $('#price').text(response.option_price);
-                        Plotly.newPlot('plot', JSON.parse(response.plot));
+                        
+                        // Create animated plot
+                        const plotData = JSON.parse(response.plot);
+                        const numPoints = plotData.data[0].x.length;
+                        const frames = [];
+                        
+                        for (let i = 0; i < numPoints; i += 10) {
+                            frames.push({
+                                name: `frame${i}`,
+                                data: [{
+                                    x: plotData.data[0].x.slice(0, i + 1),
+                                    y: plotData.data[0].y.slice(0, i + 1)
+                                }]
+                            });
+                        }
+                        
+                        const layout = {
+                            ...plotData.layout,
+                            paper_bgcolor: 'var(--surface)',
+                            plot_bgcolor: 'var(--bg)',
+                            font: { color: 'var(--text)' },
+                            xaxis: {
+                                ...plotData.layout.xaxis,
+                                gridcolor: 'var(--primary)',
+                                color: 'var(--text)'
+                            },
+                            yaxis: {
+                                ...plotData.layout.yaxis,
+                                gridcolor: 'var(--primary)',
+                                color: 'var(--text)'
+                            }
+                        };
+                        
+                        Plotly.newPlot('plot', plotData.data, layout, {
+                            frame: frames,
+                            transition: {
+                                duration: 1000,
+                                easing: 'cubic-in-out'
+                            }
+                        });
                     },
                     error: function(xhr, status, error) {
                         alert('Error calculating option price: ' + error);
