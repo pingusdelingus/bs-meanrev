@@ -28,23 +28,23 @@
                     <form id="optionForm">
                         <div class="mb-3">
                             <label for="stock_price" class="form-label" style="font-family: 'JetBrains Mono', monospace;">Current Stock Price (S)</label>
-                            <input type="number" class="form-control" id="stock_price" value="100" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
+                            <input type="number" class="form-control w-50" id="stock_price" value="100" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                         <div class="mb-3">
                             <label for="strike_price" class="form-label" style="font-family: 'JetBrains Mono', monospace;">Strike Price (K)</label>
-                            <input type="number" class="form-control" id="strike_price" value="100" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
+                            <input type="number" class="form-control w-50" id="strike_price" value="100" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                         <div class="mb-3">
                             <label for="time_to_maturity" class="form-label" style="font-family: 'JetBrains Mono', monospace;">Time to Maturity (T) in years</label>
-                            <input type="number" class="form-control" id="time_to_maturity" value="1" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
+                            <input type="number" class="form-control w-50" id="time_to_maturity" value="1" step="0.01" required style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                         <div class="mb-3">
                             <label for="risk_free_rate" class="form-label" style="font-family: 'JetBrains Mono', monospace;">Risk-Free Rate (r)</label>
-                            <input type="number" class="form-control" id="risk_free_rate" value="0.05" step="0.001" required style="font-family: 'JetBrains Mono', monospace;">
+                            <input type="number" class="form-control w-50" id="risk_free_rate" value="0.05" step="0.001" required style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                         <div class="mb-3">
                             <label for="volatility" class="form-label" style="font-family: 'JetBrains Mono', monospace;">Volatility (σ)</label>
-                            <input type="number" class="form-control" id="volatility" value="0.2" step="0.001" required style="font-family: 'JetBrains Mono', monospace;">
+                            <input type="number" class="form-control w-50" id="volatility" value="0.2" step="0.001" required style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                         <button type="submit" class="btn btn-primary" style="font-family: 'JetBrains Mono', monospace;">Calculate</button>
                     </form>
@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="result-container mt-4">
-                    <h3 style="font-family: 'JetBrains Mono', monospace;">Heston Model Pricing</h3>
+                    <h3 style="font-family: 'JetBrains Mono', monospace;">Heston Model Pricing <br> Diffusion is a OU process</h3>
                     <div id="hestonPrice" class="alert alert-info" style="font-family: 'JetBrains Mono', monospace;">
                         Heston Model Option Price: <span id="heston_price">-</span>
                     </div>
