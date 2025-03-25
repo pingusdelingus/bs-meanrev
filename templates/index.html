@@ -122,13 +122,16 @@
             
             <div class="col-md-6">
                 <div class="result-container">
-                    <h3 style="font-family: 'JetBrains Mono', monospace;">Results</h3>
+                    <h3 style="font-family: 'JetBrains Mono', monospace;">Black-Scholes Formula</h3>
                     <div class="math-formula">
                         \[
                         C(S,t) = SN(d_1) - Ke^{-rT}N(d_2)
                         \]
                         \[
                         d_1 = \frac{\ln(S/K) + (r + \sigma^2/2)T}{\sigma\sqrt{T}}, \quad d_2 = d_1 - \sigma\sqrt{T}
+                        \]
+                        \[
+                        \text{where } N(x) \text{ is the cumulative normal distribution function}
                         \]
                     </div>
                     <div id="optionPrice" class="alert alert-info" style="font-family: 'JetBrains Mono', monospace;">
@@ -146,6 +149,9 @@
                         \[
                         dS_t = rS_tdt + \sigma S_tdW_t^{\mathbb{Q}}
                         \]
+                        \[
+                        S_T = S_0\exp\left((r-\frac{\sigma^2}{2})T + \sigma W_T^{\mathbb{Q}}\right)
+                        \]
                     </div>
                     <div id="riskNeutralPrice" class="alert alert-info" style="font-family: 'JetBrains Mono', monospace;">
                         Risk-Neutral Option Price: <span id="risk_neutral_price">-</span>
@@ -154,16 +160,22 @@
                 </div>
 
                 <div class="result-container mt-4">
-                    <h3 style="font-family: 'JetBrains Mono', monospace;">Heston Model Pricing <br> Diffusion is a OU process</h3>
+                    <h3 style="font-family: 'JetBrains Mono', monospace;">Heston Model</h3>
                     <div class="math-formula">
                         \[
                         dS_t = rS_tdt + \sqrt{v_t}S_tdW_t^S
                         \]
                         \[
-                        dv_t = \kappa(\theta - v_t)dt + \sigma\sqrt{v_t}dW_t^v
+                        dv_t = \kappa(\theta - v_t)dt + \xi\sqrt{v_t}dW_t^v
                         \]
                         \[
                         d\langle W^S, W^v\rangle_t = \rho dt
+                        \]
+                        \[
+                        \text{where } \kappa \text{ is mean reversion speed, } \theta \text{ is long-run variance,}
+        \]
+                        \[
+                        \xi \text{ is volatility of volatility, and } \rho \text{ is correlation}
                         \]
                     </div>
                     <div id="hestonPrice" class="alert alert-info" style="font-family: 'JetBrains Mono', monospace;">
