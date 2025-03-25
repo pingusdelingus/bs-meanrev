@@ -14,16 +14,17 @@ app = Flask(__name__)
 
 @lru_cache(maxsize=1)
 def get_spx_options():
+    return 0
     """
     Get current SPX price and 1-month ATM options with caching
     """
     try:
         # Add delay to respect rate limits
-        time.sleep(1)
+        #time.sleep(1)
         
-        spx = yf.Ticker("^GSPC")
-        current_price = spx.info.get('regularMarketPrice', 0)
-        
+        #spx = yf.Ticker("^GSPC")
+        #current_price = spx.info.get('regularMarketPrice', 0)
+        current_price = 0
         if current_price == 0:
             return {
                 'current_price': 'N/A',
@@ -34,9 +35,11 @@ def get_spx_options():
         
         # Get options chain with error handling
         try:
-            options = spx.option_chain()
-            calls = options.calls
-            puts = options.puts
+            #options = spx.option_chain()
+            #calls = options.calls
+            #puts = options.puts
+            calls = []
+            puts = []
         except Exception as e:
             print(f"Error fetching options chain: {e}")
             return {
@@ -375,4 +378,4 @@ def heston():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(host='0.0.0.0', port=5002, debug=True) 
